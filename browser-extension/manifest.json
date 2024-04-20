@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Enhanced Dispo",
+  "version": "1.0",
+
+  "description": "",
+
+  "icons": {
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://training.vri-research.com/*"],
+      "js": ["test.js"]
+    }
+  ]
+}
+
