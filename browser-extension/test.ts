@@ -69,6 +69,31 @@ function getYIITokenFromCookies(): string {
 }
 
 /*
+ * Download the terms file from enhanced disposition page
+ */
+async function downloadTermsCSV(surveyId: string, server: string): Promise<void> {
+    const url: string = `https://${server}/index.php/admin/edispnew/sa/downloadCompleted/surveyid/463994/quotaId/all/quotaMode/all/quotaType/all`;
+    try {
+
+        const res = await fetch(url);
+        const blob = await res.blob();
+        // console.log("Blob here: ", blob);
+        const blobURL = URL.createObjectURL(blob);
+
+        const aTag = document.createElement('a');
+        aTag.href = blobURL;
+        aTag.download = `results-survey${surveyId}-terms.csv`;
+        document.body.appendChild(aTag);
+        aTag.click();
+        aTag.remove();
+
+        URL.revokeObjectURL(blobURL);
+    } catch (error) {
+        console.error("Error while downloading terms file: ", error);
+    }
+}
+
+/*
  * 1. Fetch the export results page
  * 2. Crawl through the page to find necessary values
  * Returns: string of multiple request payload options.
@@ -97,8 +122,8 @@ function getYIITokenFromCookies(): string {
     "rotation4[]": [
     "close-after-save": "false"
  */
-async function getRequestPayload(): Promise<string | undefined> {
-    const exportResultPageURL: string = "https://training.vri-research.com/index.php/admin/export/sa/exportresults/surveyid/463994";
+async function getRequestPayload(surveyId: string, server: string): Promise<string | undefined> {
+    const exportResultPageURL: string = `https://${server}/index.php/admin/export/sa/exportresults/surveyid/` + surveyId;
     try {
         const res = await fetch(exportResultPageURL);
         const pageHTML = await res.text();
@@ -160,8 +185,8 @@ async function getRequestPayload(): Promise<string | undefined> {
 /*
  * Download the all completes result file with options in the request body.
  */
-async function downloadResultsOfType(csvType: string, commonRequestPayload: string) {
-    const exportResultURL: string = "https://training.vri-research.com/index.php/admin/export/sa/exportresults/surveyid/463994";
+async function downloadResultsOfType(surveyId: string, server: string, csvType: string, commonRequestPayload: string) {
+    const exportResultURL: string = `https://${server}/index.php/admin/export/sa/exportresults/surveyid/` + surveyId;
     const requestHeaders = {
         "User-Agent": navigator.userAgent,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -177,9 +202,7 @@ async function downloadResultsOfType(csvType: string, commonRequestPayload: stri
     try {
         let requestBody: string = commonRequestPayload;
         requestBody += '&' + `type=${csvType}`;
-        const surveyId: string = getSurveyIdFromURL();
-        // TODO: Do not initiate download process if no surveyId is found. 
-        surveyId && (requestBody += '&' + `sid=${surveyId}`);
+        requestBody += '&' + `sid=${surveyId}`;
         // console.log(requestBody);
 
         const res = await fetch(exportResultURL, {
@@ -227,15 +250,23 @@ async function downloadResultsOfType(csvType: string, commonRequestPayload: stri
         CSV_MCV = 'export-multichice-encoded'
     }
 
-    let commonRequestPayload: string = await getRequestPayload();
+    const server: string = "training.vri-research.com";
+
+    const surveyId: string = getSurveyIdFromURL();
+    if (!surveyId) {
+        console.error("Cannot find survey id");
+    }
+
+    let commonRequestPayload: string = await getRequestPayload(surveyId, server);
 
     console.log("Download started!");
-    await downloadResultsOfType(CSV_Types.CSV.valueOf(), commonRequestPayload);
-    await downloadResultsOfType(CSV_Types.CSV_ERO.valueOf(), commonRequestPayload);
-    await downloadResultsOfType(CSV_Types.CSV_EROO.valueOf(), commonRequestPayload);
-    await downloadResultsOfType(CSV_Types.CSV_Tracker.valueOf(), commonRequestPayload);
-    await downloadResultsOfType(CSV_Types.CSV_HM.valueOf(), commonRequestPayload);
-    await downloadResultsOfType(CSV_Types.CSV_MCV.valueOf(), commonRequestPayload);
+    await downloadResultsOfType(surveyId, server, CSV_Types.CSV.valueOf(), commonRequestPayload);
+    await downloadResultsOfType(surveyId, server, CSV_Types.CSV_ERO.valueOf(), commonRequestPayload);
+    await downloadResultsOfType(surveyId, server, CSV_Types.CSV_EROO.valueOf(), commonRequestPayload);
+    await downloadResultsOfType(surveyId, server, CSV_Types.CSV_Tracker.valueOf(), commonRequestPayload);
+    await downloadResultsOfType(surveyId, server, CSV_Types.CSV_HM.valueOf(), commonRequestPayload);
+    await downloadResultsOfType(surveyId, server, CSV_Types.CSV_MCV.valueOf(), commonRequestPayload);
+    await downloadTermsCSV(surveyId, server);
     console.log("Download ended!");
 })();
 
