@@ -5,7 +5,13 @@
 
   "description": "",
 
-  "icons": {
+  "page_action": {
+    "default_icon": "icons/white_outline_download_icon.png"
+  },
+
+  "background": {
+    "scripts": [ "background.js" ],
+    "persistent": false
   },
 
   "content_scripts": [
@@ -13,6 +19,11 @@
       "matches": ["*://training.vri-research.com/*"],
       "js": ["test.js"]
     }
+  ],
+
+  "permissions": [
+    "activeTab",
+    "tabs"
   ]
 }
 

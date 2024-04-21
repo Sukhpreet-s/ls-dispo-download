@@ -1,3 +1,9 @@
+browser.runtime.onMessage.addListener(function (message) {
+    if (message === "initiateDownload") {
+        console.log("This message is initiated by page action click and then background script");
+        downloadFiles();
+    }
+});
 /*
  * CSV type: csv
  * CSV from ExportRotationOrders type: "export-rotation-orders"
@@ -67,7 +73,7 @@ function getYIITokenFromCookies() {
  * Download the terms file from enhanced disposition page
  */
 async function downloadTermsCSV(surveyId, server) {
-    const url = `https://${server}/index.php/admin/edispnew/sa/downloadCompleted/surveyid/463994/quotaId/all/quotaMode/all/quotaType/all`;
+    const url = `https://${server}/index.php/admin/edispnew/sa/downloadCompleted/surveyid/${surveyId}/quotaId/all/quotaMode/all/quotaType/all`;
     try {
         const res = await fetch(url);
         const blob = await res.blob();
@@ -216,7 +222,7 @@ async function downloadResultsOfType(surveyId, server, csvType, commonRequestPay
         console.error("Error while downloading\n", error);
     }
 }
-(async function () {
+async function downloadFiles() {
     console.log("Hulululululuululu from Boogie Man!");
     // run code here
     let CSV_Types;
@@ -243,4 +249,4 @@ async function downloadResultsOfType(surveyId, server, csvType, commonRequestPay
     await downloadResultsOfType(surveyId, server, CSV_Types.CSV_MCV.valueOf(), commonRequestPayload);
     await downloadTermsCSV(surveyId, server);
     console.log("Download ended!");
-})();
+}

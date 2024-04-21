@@ -1,3 +1,10 @@
+browser.runtime.onMessage.addListener(function(message: string) {
+    if (message === "initiateDownload") {
+        console.log("This message is initiated by page action click and then background script");
+        downloadFiles();
+    }
+});
+
 /* 
  * CSV type: csv
  * CSV from ExportRotationOrders type: "export-rotation-orders"
@@ -72,7 +79,7 @@ function getYIITokenFromCookies(): string {
  * Download the terms file from enhanced disposition page
  */
 async function downloadTermsCSV(surveyId: string, server: string): Promise<void> {
-    const url: string = `https://${server}/index.php/admin/edispnew/sa/downloadCompleted/surveyid/463994/quotaId/all/quotaMode/all/quotaType/all`;
+    const url: string = `https://${server}/index.php/admin/edispnew/sa/downloadCompleted/surveyid/${surveyId}/quotaId/all/quotaMode/all/quotaType/all`;
     try {
 
         const res = await fetch(url);
@@ -237,7 +244,7 @@ async function downloadResultsOfType(surveyId: string, server: string, csvType: 
     }
 }
 
-(async function() {
+async function downloadFiles() {
     console.log("Hulululululuululu from Boogie Man!");
 
     // run code here
@@ -268,5 +275,5 @@ async function downloadResultsOfType(surveyId: string, server: string, csvType: 
     await downloadResultsOfType(surveyId, server, CSV_Types.CSV_MCV.valueOf(), commonRequestPayload);
     await downloadTermsCSV(surveyId, server);
     console.log("Download ended!");
-})();
+}
 

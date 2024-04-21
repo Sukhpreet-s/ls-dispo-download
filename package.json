@@ -5,11 +5,12 @@
   "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "npx tsc && cp browser-extension/manifest.json dist/"
+    "compile": "npx tsc && rsync -av --exclude='*.ts' browser-extension/ dist/"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/firefox-webext-browser": "^120.0.3",
     "typescript": "^5.4.5"
   }
 }
