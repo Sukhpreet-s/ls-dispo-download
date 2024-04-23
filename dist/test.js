@@ -33,8 +33,6 @@ function getSurveyIdFromURL() {
 }
 function getStaticPayloadValues() {
     let payload = '';
-    payload += 'export_from' + '=' + '1';
-    payload += '&' + 'export_to' + '=' + '2';
     payload += '&' + 'completionstate' + '=' + 'all';
     payload += '&' + 'exportlang' + '=' + 'en';
     payload += '&' + 'headstyle' + '=' + 'code';
@@ -47,6 +45,7 @@ function getStaticPayloadValues() {
     payload += '&' + 'converty' + '=' + 'Y';
     payload += '&' + 'convertyto' + '=' + '1';
     payload += '&' + 'convertnto' + '=' + '2';
+    payload += '&' + 'addmcothercol' + '=' + 'Y';
     payload += '&' + 'close-after-save' + '=' + 'false';
     return payload;
 }
@@ -99,7 +98,7 @@ async function downloadTermsCSV(surveyId, server) {
     "YII_CSRF_TOKEN": "",
     "type": "csv",
     "export_from": "1",
-    "export_to": "2",
+    "export_to": "2", 9
     "completionstate": "complete",
     "exportlang": "en",
     "headstyle": "code",
@@ -160,6 +159,11 @@ async function getRequestPayload(surveyId, server) {
                 requestBodyString += '&' + encodeArray(keyName, value);
             }
         }
+        // Extract export_from & export_to values
+        const exportFromInputEl = doc.getElementById('export_from');
+        requestBodyString += '&' + 'export_from=' + exportFromInputEl.value;
+        const exportToInputEl = doc.getElementById('export_to');
+        requestBodyString += '&' + 'export_to=' + exportToInputEl.value;
         const csrfToken = getYIITokenFromCookies();
         const TOKEN_NAME = 'YII_CSRF_TOKEN';
         // TODO: Throw error if no token found
@@ -192,7 +196,7 @@ async function downloadResultsOfType(surveyId, server, csvType, commonRequestPay
         let requestBody = commonRequestPayload;
         requestBody += '&' + `type=${csvType}`;
         requestBody += '&' + `sid=${surveyId}`;
-        // console.log(requestBody);
+        console.log("Request body: ", requestBody);
         const res = await fetch(exportResultURL, {
             "credentials": "include", // This must be present to include cookies in the request headers.
             "headers": requestHeaders,
@@ -200,7 +204,7 @@ async function downloadResultsOfType(surveyId, server, csvType, commonRequestPay
             "method": "POST",
             "mode": "cors"
         });
-        // console.log("Response here: ", res);
+        console.log("Response here: ", res);
         if (!res.ok) {
             console.error("Response: ", res);
             throw new Error("Bad response");
