@@ -20,9 +20,6 @@ const filter = {
         "https://insight-polls.com/index.php/admin/edispnew/sa/index/surveyid/*",
         "https://insight-polls.com/index.php/admin/responses/sa/*/surveyid/*",
 
-        "https://insight-polls.com/index.php/admin/edispnew/sa/index/surveyid/*",
-        "https://insight-polls.com/index.php/admin/responses/sa/*/surveyid/*",
-
         "https://viewpointpoll.com/index.php/admin/edispnew/sa/index/surveyid/*",
         "https://viewpointpoll.com/index.php/admin/responses/sa/*/surveyid/*",
 

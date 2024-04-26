@@ -15,8 +15,6 @@ const filter = {
         "https://opinions-survey.com/index.php/admin/responses/sa/*/surveyid/*",
         "https://insight-polls.com/index.php/admin/edispnew/sa/index/surveyid/*",
         "https://insight-polls.com/index.php/admin/responses/sa/*/surveyid/*",
-        "https://insight-polls.com/index.php/admin/edispnew/sa/index/surveyid/*",
-        "https://insight-polls.com/index.php/admin/responses/sa/*/surveyid/*",
         "https://viewpointpoll.com/index.php/admin/edispnew/sa/index/surveyid/*",
         "https://viewpointpoll.com/index.php/admin/responses/sa/*/surveyid/*",
         "https://p.vri-research.com/index.php/admin/edispnew/sa/index/surveyid/*",
