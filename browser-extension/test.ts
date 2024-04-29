@@ -26,13 +26,21 @@ function encodeArray(key: string, values: string[]): string {
 }
 
 /*
- * Retreive survey id from the current page's url.
+ * Retrieve survey id from the current page's url.
  */
 function getSurveyIdFromURL(): string {
     if (!location) return;
 
     const startIdx = location.pathname.lastIndexOf('/') + 1;
     return location.pathname.substring(startIdx);
+}
+
+/**
+ * Retrieve the server name from URL.
+ */
+function getServerNameFromURL(): string {
+    if (!location) return;
+    return location.hostname;
 }
 
 function getStaticPayloadValues(): string {
@@ -262,11 +270,17 @@ async function downloadFiles() {
         CSV_MCV = 'export-multichice-encoded'
     }
 
-    const server: string = "training.vri-research.com";
+    const server: string = getServerNameFromURL();
+    console.log("Server id: ", server);
+    if (!server) {
+        console.error("Cannot resolve server name");
+        return;
+    }
 
     const surveyId: string = getSurveyIdFromURL();
     if (!surveyId) {
         console.error("Cannot find survey id");
+        return;
     }
 
     let commonRequestPayload: string = await getRequestPayload(surveyId, server);

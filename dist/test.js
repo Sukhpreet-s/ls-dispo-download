@@ -23,13 +23,21 @@ function encodeArray(key, values) {
     }).join('&');
 }
 /*
- * Retreive survey id from the current page's url.
+ * Retrieve survey id from the current page's url.
  */
 function getSurveyIdFromURL() {
     if (!location)
         return;
     const startIdx = location.pathname.lastIndexOf('/') + 1;
     return location.pathname.substring(startIdx);
+}
+/**
+ * Retrieve the server name from URL.
+ */
+function getServerNameFromURL() {
+    if (!location)
+        return;
+    return location.hostname;
 }
 function getStaticPayloadValues() {
     let payload = '';
@@ -238,10 +246,16 @@ async function downloadFiles() {
         CSV_Types["CSV_HM"] = "export-heatmap-text";
         CSV_Types["CSV_MCV"] = "export-multichice-encoded";
     })(CSV_Types || (CSV_Types = {}));
-    const server = "training.vri-research.com";
+    const server = getServerNameFromURL();
+    console.log("Server id: ", server);
+    if (!server) {
+        console.error("Cannot resolve server name");
+        return;
+    }
     const surveyId = getSurveyIdFromURL();
     if (!surveyId) {
         console.error("Cannot find survey id");
+        return;
     }
     let commonRequestPayload = await getRequestPayload(surveyId, server);
     console.log("Download started!");
