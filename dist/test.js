@@ -38,9 +38,6 @@ function getServerNameFromURL() {
     if (!location)
         return;
     return location.hostname;
-    // const startIdxInclusive = location.pathname.indexOf('//') + 2;
-    // const endIdxExclusive = location.pathname.indexOf('/', startIdxInclusive);
-    // return location.pathname.substring(startIdxInclusive, endIdxExclusive);
 }
 function getStaticPayloadValues() {
     let payload = '';
