@@ -223,7 +223,7 @@ async function downloadResultsOfType(surveyId: string, server: string, csvType: 
         let requestBody: string = commonRequestPayload;
         requestBody += '&' + `type=${csvType}`;
         requestBody += '&' + `sid=${surveyId}`;
-        console.log("Request body: ", requestBody);
+        // console.log("Request body: ", requestBody);
 
         const res = await fetch(exportResultURL, {
             "credentials": "include", // This must be present to include cookies in the request headers.
