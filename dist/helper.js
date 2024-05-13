@@ -51,8 +51,28 @@ export function getStaticPayloadValues() {
     payload += '&' + 'close-after-save' + '=' + 'false';
     return payload;
 }
-export function encodeArray2(key, values) {
+export function encodeArray(key, values) {
     return values.map((currentVal) => {
         return `${key}%5B%5D=${currentVal}`;
     }).join('&');
+}
+/*
+ * Retrieve survey id from the current page's url.
+ */
+export function extractSurveyId(url) {
+    const startIdx = url.lastIndexOf('/') + 1;
+    return url.substring(startIdx);
+}
+/**
+ * Retrieve the server name from URL.
+ */
+export function extractHostname(url) {
+    try {
+        const urlObject = new URL(url);
+        return urlObject.hostname;
+    }
+    catch (error) {
+        // console.error("Invalid URL:", error);
+        return null;
+    }
 }

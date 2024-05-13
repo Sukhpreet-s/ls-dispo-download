@@ -45,7 +45,6 @@ export async function getYIITokenFromCookies(): Promise<string | undefined> {
     return await getCookies();
 }
 
-
 export function getStaticPayloadValues(): string {
     let payload: string = '';
     payload += '&' + 'completionstate' + '=' + 'all';
@@ -66,9 +65,29 @@ export function getStaticPayloadValues(): string {
 }
 
 
-export function encodeArray2(key: string, values: string[]): string {
+export function encodeArray(key: string, values: string[]): string {
     return values.map((currentVal: string) => {
         return `${key}%5B%5D=${currentVal}`;
     }).join('&');
 }
 
+/*
+ * Retrieve survey id from the current page's url.
+ */
+export function extractSurveyId (url: string): string {
+    const startIdx = url.lastIndexOf('/') + 1;
+    return url.substring(startIdx);
+}
+
+/**
+ * Retrieve the server name from URL.
+ */
+export function extractHostname(url: string): string | null {
+    try {
+        const urlObject = new URL(url);
+        return urlObject.hostname;
+    } catch (error) {
+        // console.error("Invalid URL:", error);
+        return null;
+    }
+}
