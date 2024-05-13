@@ -5,7 +5,9 @@
   "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc && rsync -av --exclude='*.ts' browser-extension/ dist/"
+    "build": "npx tsc && rsync -av --exclude='*.ts' browser-extension/ dist/",
+    "clean": "rm -rf dist",
+    "lint": "web-ext lint"
   },
   "author": "",
   "license": "ISC",
