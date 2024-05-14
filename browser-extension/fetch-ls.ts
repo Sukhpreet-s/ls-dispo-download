@@ -24,7 +24,7 @@ export async function downloadFiles(server: string, surveyId: string) {
         console.log("Download ended!");
 
     } catch (error) {
-        console.log("Download file interrupted!\nError: ", error);
+        console.error("File download interrupted!");
     }
 }
 
@@ -72,7 +72,6 @@ async function getRequestPayload(surveyId: string, server: string): Promise<stri
         const c: NodeListOf<HTMLOptionElement> = doc.querySelectorAll('select#colselect > option[selected="selected"');
         if (c.length > 0) {
             const colselectOptions: string[] = Array.from(c).map((el: HTMLOptionElement) => el.value);
-            // console.log(colselectOptions);
             requestBodyString += encodeArray('colselect', colselectOptions);
         }
 
@@ -96,9 +95,7 @@ async function getRequestPayload(surveyId: string, server: string): Promise<stri
 
             for (let rot of rotationData) {
                 // Convert { "rot1": ["x", "y"] } => [ "rot1", ["x", "y"] ]
-                // console.log("Rot: ", rot);
                 const [keyName, value]: [string, string[]] = Object.entries(rot)[0];
-                // console.log(keyName, value);
                 requestBodyString += '&' + encodeArray(keyName, value);
             }
         }
@@ -116,10 +113,8 @@ async function getRequestPayload(surveyId: string, server: string): Promise<stri
 
         requestBodyString += '&' + getStaticPayloadValues();
 
-        // console.log(requestBodyString);
         return requestBodyString;
     } catch (error) {
-        console.error("Error stack: ", error);
         throw new Error("Error while building request payload!");
     }
 }
@@ -133,7 +128,6 @@ async function downloadTermsCSV(surveyId: string, server: string): Promise<void>
 
         const res = await fetch(url);
         const blob = await res.blob();
-        // console.log("Blob here: ", blob);
         const blobURL = URL.createObjectURL(blob);
 
         const aTag = document.createElement('a');
@@ -145,7 +139,6 @@ async function downloadTermsCSV(surveyId: string, server: string): Promise<void>
 
         URL.revokeObjectURL(blobURL);
     } catch (error) {
-        console.log("Error stack: ", error);
         throw new Error("Error while downloading terms file");
     }
 }
@@ -164,7 +157,6 @@ async function downloadResultsOfType(surveyId: string, server: string, csvType: 
         let requestBody: string = commonRequestPayload;
         requestBody += '&' + `type=${csvType}`;
         requestBody += '&' + `sid=${surveyId}`;
-        // console.log("Request body: ", requestBody);
 
         const res = await fetch(exportResultURL, {
             // "credentials": "include", // This is not needed as it is automatically being set.
@@ -173,15 +165,11 @@ async function downloadResultsOfType(surveyId: string, server: string, csvType: 
             "method": "POST",
         });
         if (!res.ok) {
-            console.error("Response: ", res);
-            throw new Error("Bad response");
-        } else {
-            console.log("Response here: ", res);
+            throw new Error(`Bad response while downloading ${csvType}`);
         }
 
         // TODO: Create a loading bar for downloading.
         const blob = await res.blob();
-        // console.log("Blob here: ", blob);
         const blobURL = URL.createObjectURL(blob);
 
         const aTag = document.createElement('a');
@@ -193,7 +181,6 @@ async function downloadResultsOfType(surveyId: string, server: string, csvType: 
 
         URL.revokeObjectURL(blobURL);
     } catch (error) {
-        console.error("Error stack: ", error);
         throw new Error(`While downloading type: ${csvType}`);
     }
 }

@@ -61,7 +61,11 @@ export function encodeArray(key, values) {
  */
 export function extractSurveyId(url) {
     const startIdx = url.lastIndexOf('/') + 1;
-    return url.substring(startIdx);
+    const surveyId = url.substring(startIdx);
+    if (surveyId === "") {
+        return null;
+    }
+    return surveyId;
 }
 /**
  * Retrieve the server name from URL.
@@ -72,7 +76,6 @@ export function extractHostname(url) {
         return urlObject.hostname;
     }
     catch (error) {
-        // console.error("Invalid URL:", error);
         return null;
     }
 }

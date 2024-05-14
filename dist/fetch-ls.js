@@ -22,7 +22,7 @@ export async function downloadFiles(server, surveyId) {
         console.log("Download ended!");
     }
     catch (error) {
-        console.log("Download file interrupted!\nError: ", error);
+        console.error("File download interrupted!");
     }
 }
 /*
@@ -66,7 +66,6 @@ async function getRequestPayload(surveyId, server) {
         const c = doc.querySelectorAll('select#colselect > option[selected="selected"');
         if (c.length > 0) {
             const colselectOptions = Array.from(c).map((el) => el.value);
-            // console.log(colselectOptions);
             requestBodyString += encodeArray('colselect', colselectOptions);
         }
         // Extract rotation data
@@ -88,9 +87,7 @@ async function getRequestPayload(surveyId, server) {
             });
             for (let rot of rotationData) {
                 // Convert { "rot1": ["x", "y"] } => [ "rot1", ["x", "y"] ]
-                // console.log("Rot: ", rot);
                 const [keyName, value] = Object.entries(rot)[0];
-                // console.log(keyName, value);
                 requestBodyString += '&' + encodeArray(keyName, value);
             }
         }
@@ -104,11 +101,9 @@ async function getRequestPayload(surveyId, server) {
         // TODO: Throw error if no token found
         csrfToken && (requestBodyString += '&' + `${TOKEN_NAME}=${csrfToken}`);
         requestBodyString += '&' + getStaticPayloadValues();
-        // console.log(requestBodyString);
         return requestBodyString;
     }
     catch (error) {
-        console.error("Error stack: ", error);
         throw new Error("Error while building request payload!");
     }
 }
@@ -120,7 +115,6 @@ async function downloadTermsCSV(surveyId, server) {
     try {
         const res = await fetch(url);
         const blob = await res.blob();
-        // console.log("Blob here: ", blob);
         const blobURL = URL.createObjectURL(blob);
         const aTag = document.createElement('a');
         aTag.href = blobURL;
@@ -131,7 +125,6 @@ async function downloadTermsCSV(surveyId, server) {
         URL.revokeObjectURL(blobURL);
     }
     catch (error) {
-        console.log("Error stack: ", error);
         throw new Error("Error while downloading terms file");
     }
 }
@@ -148,7 +141,6 @@ async function downloadResultsOfType(surveyId, server, csvType, commonRequestPay
         let requestBody = commonRequestPayload;
         requestBody += '&' + `type=${csvType}`;
         requestBody += '&' + `sid=${surveyId}`;
-        // console.log("Request body: ", requestBody);
         const res = await fetch(exportResultURL, {
             // "credentials": "include", // This is not needed as it is automatically being set.
             "headers": requestHeaders,
@@ -156,15 +148,10 @@ async function downloadResultsOfType(surveyId, server, csvType, commonRequestPay
             "method": "POST",
         });
         if (!res.ok) {
-            console.error("Response: ", res);
-            throw new Error("Bad response");
-        }
-        else {
-            console.log("Response here: ", res);
+            throw new Error(`Bad response while downloading ${csvType}`);
         }
         // TODO: Create a loading bar for downloading.
         const blob = await res.blob();
-        // console.log("Blob here: ", blob);
         const blobURL = URL.createObjectURL(blob);
         const aTag = document.createElement('a');
         aTag.href = blobURL;
@@ -175,7 +162,6 @@ async function downloadResultsOfType(surveyId, server, csvType, commonRequestPay
         URL.revokeObjectURL(blobURL);
     }
     catch (error) {
-        console.error("Error stack: ", error);
         throw new Error(`While downloading type: ${csvType}`);
     }
 }
