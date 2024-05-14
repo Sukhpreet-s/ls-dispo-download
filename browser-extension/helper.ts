@@ -91,3 +91,22 @@ export function extractHostname(url: string): string | null {
         return null;
     }
 }
+
+/*
+ * This function is currently not being used.
+ * Retreive cookie value of csrf token in the context of content script.
+ */
+function OLD_getYIITokenFromCookies(): string {
+    if (!document || !document.cookie) return;
+
+    const TOKEN_NAME: string = 'YII_CSRF_TOKEN';
+    const cookieList = document.cookie.split(';');
+
+    for (let cookie of cookieList) {
+        const c = cookie.trim();
+        if (c.startsWith(TOKEN_NAME)) {
+            const startIdx: number = c.lastIndexOf('=') + 1;
+            return c.substring(startIdx);
+        }
+    }
+}
