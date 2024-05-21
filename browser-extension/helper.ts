@@ -74,9 +74,13 @@ export function encodeArray(key: string, values: string[]): string {
 /*
  * Retrieve survey id from the current page's url.
  */
-export function extractSurveyId (url: string): string {
+export function extractSurveyId (url: string): string | null {
     const startIdx = url.lastIndexOf('/') + 1;
-    return url.substring(startIdx);
+    const surveyId = url.substring(startIdx);
+    if (surveyId === ""){
+        return null;
+    }
+    return surveyId;
 }
 
 /**
@@ -87,7 +91,6 @@ export function extractHostname(url: string): string | null {
         const urlObject = new URL(url);
         return urlObject.hostname;
     } catch (error) {
-        // console.error("Invalid URL:", error);
         return null;
     }
 }
