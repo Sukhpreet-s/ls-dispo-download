@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
-  "name": "Enhanced Dispo",
+  "name": "Enhanced Dispo (Firefox)",
   "version": "1.0",
 
   "description": "",
 
-  "action": {
+  "page_action": {
     "default_icon": "icons/white_outline_download_icon.png"
   },
 
@@ -22,4 +22,3 @@
     "cookies"
   ]
 }
-

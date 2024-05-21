@@ -5,7 +5,11 @@
   "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc && rsync -av --exclude='*.ts' browser-extension/ dist/",
+    "build": "npm run clean && npx tsc && rsync -av --exclude='*.ts' --exclude='manifest-*.json' browser-extension/ dist/",
+    "build-firefox": "npm run clean && npx tsc && rsync -av --exclude='*.ts' --exclude='manifest*.json' browser-extension/ dist/ && cp browser-extension/manifest-firefox.json dist/manifest.json",
+    "build-chrome": "npm run clean && npx tsc && rsync -av --exclude='*.ts' --exclude='manifest*.json' browser-extension/ dist/ && cp browser-extension/manifest-chrome.json dist/manifest.json",
+    "bf": "npm run build-firefox",
+    "bc": "npm run build-chrome",
     "clean": "rm -rf dist",
     "lint": "web-ext lint"
   },
