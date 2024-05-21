@@ -10,7 +10,7 @@
   },
 
   "background": {
-    "scripts": [ "background.js" ],
+    "scripts": [ "lib/browser-polyfill.min.js", "background.js" ],
     "persistent": false,
     "type": "module"
   },
