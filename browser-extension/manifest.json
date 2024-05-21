@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Enhanced Dispo",
   "version": "1.0",
 
@@ -10,8 +10,7 @@
   },
 
   "background": {
-    "scripts": [ "background.js" ],
-    "persistent": false,
+    "scripts": [ "browser-polyfill.js", "background.js" ],
     "type": "module"
   },
 
@@ -20,8 +19,10 @@
     "tabs",
     "webRequest",
     "webRequestBlocking",
-    "https://training.vri-research.com/*",
     "cookies"
+  ],
+  "host_permissions": [
+    "https://training.vri-research.com/*"
   ]
 }
 
