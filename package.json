@@ -5,7 +5,7 @@
   "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "npx tsc && rsync -av --exclude='*.ts' browser-extension/ dist/",
+    "compile": "npx tsc && cp -r src/icons dist/icons && cp src/manifest.json dist",
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf dist",
     "lint": "web-ext lint"

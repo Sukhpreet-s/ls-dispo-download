@@ -1,32 +1,46 @@
-import { encodeArray, getYIITokenFromCookies, getStaticPayloadValues } from './helper.js';
-
-export async function downloadFiles(server: string, surveyId: string) {
-    enum CSV_Types {
-        CSV = 'csv',
-        CSV_ERO = 'export-rotation-orders',
-        CSV_EROO = 'export-rotation-orders-options',
-        CSV_Tracker = 'export-rotation-orders-tracker',
-        CSV_HM = 'export-heatmap-text',
-        CSV_MCV = 'export-multichice-encoded'
+// When extension button is clicked, execute the download process 
+browser.action.onClicked.addListener(async function (tab: browser.tabs.Tab) {
+    if (!tab.id) return; // This should not happen since the page_action should only be available if applicable tab is open.
+    // Check if on the right tab to execute the process.
+    const serverName: string = extractHostname(tab.url);
+    const surveyId: string = extractSurveyId(tab.url);
+    const validServerNames = [
+        "training.vri-research.com",
+        "opinion-insight.com",
+        "research-opinions.com",
+        "opinions-survey.com",
+        "insight-polls.com",
+        "viewpointpoll.com",
+        "p.vri-research.com",
+        "m.vri-research.com",
+    ];
+    if (!serverName || !surveyId || !validServerNames.some(name => name===serverName) ) {
+        console.error("Wrong tab or you're the fastest in the west since you changed tabs so fast!");
+        return;
     }
 
     try {
-        let commonRequestPayload: string = await getRequestPayload(surveyId, server);
-
         console.log("Download started!");
-        await downloadResultsOfType(surveyId, server, CSV_Types.CSV.valueOf(), commonRequestPayload);
-        await downloadResultsOfType(surveyId, server, CSV_Types.CSV_ERO.valueOf(), commonRequestPayload);
-        await downloadResultsOfType(surveyId, server, CSV_Types.CSV_EROO.valueOf(), commonRequestPayload);
-        await downloadResultsOfType(surveyId, server, CSV_Types.CSV_Tracker.valueOf(), commonRequestPayload);
-        await downloadResultsOfType(surveyId, server, CSV_Types.CSV_HM.valueOf(), commonRequestPayload);
-        await downloadResultsOfType(surveyId, server, CSV_Types.CSV_MCV.valueOf(), commonRequestPayload);
-        await downloadTermsCSV(surveyId, server);
+        let commonRequestPayload: string = await getRequestPayload(surveyId, serverName);
+        const CSV_Types: string[] = [
+            'csv',
+            'export-rotation-orders',
+            'export-rotation-orders-options',
+            'export-rotation-orders-tracker',
+            'export-heatmap-text',
+            'export-multichice-encoded',
+        ];
+        for (let csvType of CSV_Types) {
+            await downloadResultsOfType(surveyId, serverName, csvType, commonRequestPayload);
+        }
+        await downloadTermsCSV(surveyId, serverName);
         console.log("Download ended!");
-
     } catch (error) {
         console.error("File download interrupted!");
     }
-}
+});
+
+// ----Data fetching functions below
 
 /*
  * 1. Fetch the export results page
@@ -119,9 +133,7 @@ async function getRequestPayload(surveyId: string, server: string): Promise<stri
     }
 }
 
-/*
- * Download the terms file from enhanced disposition page
- */
+// Download the terms file from enhanced disposition page
 async function downloadTermsCSV(surveyId: string, server: string): Promise<void> {
     const url: string = `https://${server}/index.php/admin/edispnew/sa/downloadCompleted/surveyid/${surveyId}/quotaId/all/quotaMode/all/quotaType/all`;
     try {
@@ -143,9 +155,7 @@ async function downloadTermsCSV(surveyId: string, server: string): Promise<void>
     }
 }
 
-/*
- * Download the all completes result file with options in the request body.
- */
+// Download the all completes result file with options in the request body.
 async function downloadResultsOfType(surveyId: string, server: string, csvType: string, commonRequestPayload: string) {
     const exportResultURL: string = `https://${server}/index.php/admin/export/sa/exportresults/surveyid/` + surveyId;
     const requestHeaders = {
@@ -182,5 +192,85 @@ async function downloadResultsOfType(surveyId: string, server: string, csvType: 
         URL.revokeObjectURL(blobURL);
     } catch (error) {
         throw new Error(`While downloading type: ${csvType}`);
+    }
+}
+
+// ----Some extra helper functions below
+
+function getStaticPayloadValues(): string {
+    let payload: string = '';
+    payload += '&' + 'completionstate' + '=' + 'all';
+    payload += '&' + 'exportlang' + '=' + 'en';
+    payload += '&' + 'headstyle' + '=' + 'code';
+    payload += '&' + 'headspacetounderscores' + '=' + '0';
+    payload += '&' + 'abbreviatedtext' + '=' + '0';
+    payload += '&' + 'abbreviatedtextto' + '=' + '15';
+    payload += '&' + 'emcode' + '=' + '0';
+    payload += '&' + 'codetextseparator' + '=' + '.+';
+    payload += '&' + 'answers' + '=' + 'short';
+    payload += '&' + 'converty' + '=' + 'Y';
+    payload += '&' + 'convertyto' + '=' + '1';
+    payload += '&' + 'convertnto' + '=' + '2';
+    payload += '&' + 'addmcothercol' + '=' + 'Y';
+    payload += '&' + 'close-after-save' + '=' + 'false';
+    return payload;
+}
+
+// Retreive cookie value of csrf token
+async function getYIITokenFromCookies(): Promise<string | undefined> {
+    const tab = (await browser.tabs.query({ currentWindow: true, active: true })).pop();
+
+    const cookies = await browser.cookies.getAll({ url: tab.url });
+
+    if (cookies.length > 0) {
+        for (let cookie of cookies) {
+            if (cookie.name === "YII_CSRF_TOKEN") {
+                return cookie.value;
+            }
+        }
+    }
+}
+
+// Convert an array into string with encoding required by the server.
+function encodeArray(key: string, values: string[]): string {
+    return values.map((currentVal: string) => {
+        return `${key}%5B%5D=${currentVal}`;
+    }).join('&');
+}
+
+// Retrieve survey id from the current page's url.
+function extractSurveyId (url: string): string | null {
+    const startIdx = url.lastIndexOf('/') + 1;
+    const surveyId = url.substring(startIdx);
+    if (surveyId === ""){
+        return null;
+    }
+    return surveyId;
+}
+
+// Retrieve the server name from URL.
+function extractHostname(url: string): string | null {
+    try {
+        const urlObject = new URL(url);
+        return urlObject.hostname;
+    } catch (error) {
+        return null;
+    }
+}
+
+// This function is currently not being used.
+// Retreive cookie value of csrf token in the context of content script.
+function OLD_getYIITokenFromCookies(): string {
+    if (!document || !document.cookie) return;
+
+    const TOKEN_NAME: string = 'YII_CSRF_TOKEN';
+    const cookieList = document.cookie.split(';');
+
+    for (let cookie of cookieList) {
+        const c = cookie.trim();
+        if (c.startsWith(TOKEN_NAME)) {
+            const startIdx: number = c.lastIndexOf('=') + 1;
+            return c.substring(startIdx);
+        }
     }
 }
