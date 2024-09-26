@@ -19,7 +19,14 @@
     "cookies"
   ],
   "host_permissions": [
-    "https://training.vri-research.com/*"
+    "https://training.vri-research.com/*",
+    "https://opinion-insight.com/*",
+    "https://research-opinions.com/*",
+    "https://opinions-survey.com/*",
+    "https://insight-polls.com/*",
+    "https://viewpointpoll.com/*",
+    "https://p.vri-research.com/*",
+    "https://m.vri-research.com/*"
   ]
 }
 
