@@ -5,7 +5,7 @@
 
   "description": "",
 
-  "page_action": {
+  "action": {
     "default_icon": "icons/white_outline_download_icon.png"
   },
 
