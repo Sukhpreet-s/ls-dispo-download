@@ -5,23 +5,15 @@ browser.action.onClicked.addListener(async function (tab) {
     // Check if on the right tab to execute the process.
     const serverName = extractHostname(tab.url);
     const surveyId = extractSurveyId(tab.url);
-    const validServerNames = [
-        "training.vri-research.com",
-        "opinion-insight.com",
-        "research-opinions.com",
-        "opinions-survey.com",
-        "insight-polls.com",
-        "viewpointpoll.com",
-        "p.vri-research.com",
-        "m.vri-research.com",
-    ];
+    const validServerNames = browser.runtime.getManifest().host_permissions
+        .map(url => extractHostname(url));
     if (!serverName || !surveyId || !validServerNames.some(name => name === serverName)) {
         console.error("Wrong tab or you're the fastest in the west since you changed tabs so fast!");
         return;
     }
     try {
-        console.log("Download started!");
         let commonRequestPayload = await getRequestPayload(surveyId, serverName);
+        console.log("Download started!");
         const CSV_Types = [
             'csv',
             'export-rotation-orders',
