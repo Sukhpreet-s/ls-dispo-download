@@ -1,12 +1,19 @@
 # Download disposition files with one click
 
 - Click on the extension icon to initiate the download process.
-- Applicable URLs on which the download works:
-    - URL that contains valid server name (see below), and
-    - contains survey id.
+- URLs on which the download works:
+    - URL that contains valid **server name** (see below), and
+    - contains **survey id**.
 
-- Applicable server names:
+- Valid server names:
     1. `training.vri-research.com`
+    2. `opinion-insight.com`
+    3. `research-opinions.com`
+    4. `opinions-survey.com`
+    5. `insight-polls.com`
+    6. `viewpointpoll.com`
+    7. `p.vri-research.com`
+    8. `m.vri-research.com`
 
 - It downloads the following files:
     1. CSV (includes all responses): `results-survey{surveyId}.csv`
